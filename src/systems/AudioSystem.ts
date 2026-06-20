@@ -276,16 +276,18 @@ export function playUIClick() {
 
 export function playVictorySound() {
   if (!actx || !sfxGain) return;
-  const t = actx.currentTime;
+  const ctx = actx;
+  const gainNode = sfxGain;
+  const t = ctx.currentTime;
   [440, 554.37, 659.25, 880].forEach((freq, i) => {
-    const osc = actx.createOscillator();
-    const gain = actx.createGain();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
     osc.type = 'square';
     osc.frequency.value = freq;
     gain.gain.setValueAtTime(0.2, t + i * 0.2);
     gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.2 + 1.0);
     osc.connect(gain);
-    gain.connect(sfxGain);
+    gain.connect(gainNode);
     osc.start(t + i * 0.2);
     osc.stop(t + i * 0.2 + 1.0);
   });
@@ -293,16 +295,18 @@ export function playVictorySound() {
 
 export function playDefeatSound() {
   if (!actx || !sfxGain) return;
-  const t = actx.currentTime;
+  const ctx = actx;
+  const gainNode = sfxGain;
+  const t = ctx.currentTime;
   [300, 250, 200, 150].forEach((freq, i) => {
-    const osc = actx.createOscillator();
-    const gain = actx.createGain();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
     osc.type = 'sawtooth';
     osc.frequency.value = freq;
     gain.gain.setValueAtTime(0.2, t + i * 0.4);
     gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.4 + 1.5);
     osc.connect(gain);
-    gain.connect(sfxGain);
+    gain.connect(gainNode);
     osc.start(t + i * 0.4);
     osc.stop(t + i * 0.4 + 1.5);
   });
