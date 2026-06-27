@@ -46,7 +46,6 @@ export default function TrainingHubScene() {
 
   const handleStartFight = () => {
     if (!player) return;
-    // Pick random AI opponent excluding player
     const availableAIs = fighters.filter((f) => f.id !== player.id);
     const ai = availableAIs[Math.floor(Math.random() * availableAIs.length)] || fighters[0];
     
@@ -54,6 +53,20 @@ export default function TrainingHubScene() {
     startCombat(player.id, ai.id);
     setScene('combat');
   };
+
+  // Dynamic 3D Animation based on training state
+  let currentAnim = 'idle';
+  if (lastResult) {
+    currentAnim = 'victory';
+  } else if (activeGame === 'punch') {
+    currentAnim = 'light_attack';
+  } else if (activeGame === 'kick') {
+    currentAnim = 'low_kick';
+  } else if (activeGame === 'reaction') {
+    currentAnim = 'dodge';
+  } else if (activeGame === 'endurance') {
+    currentAnim = 'defend';
+  }
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#0D0D12', display: 'flex', overflow: 'hidden' }}>
@@ -105,24 +118,24 @@ export default function TrainingHubScene() {
         </button>
       </div>
 
-      {/* Center Panel: 3D Gym View */}
+      {/* Center Panel: 3D Gym View (Perfectly scaled & centered) */}
       <div style={{ flex: 1, height: '100%', position: 'relative' }}>
         <Canvas shadows>
-          <PerspectiveCamera makeDefault position={[0, 1.3, 3.5]} fov={45} />
+          <PerspectiveCamera makeDefault position={[0, 0.2, 3.8]} fov={45} />
           <GymLighting />
           
           {player && (
-            <group position={[0, -0.9, 0]}>
+            <group position={[0, -0.85, 0]}>
               <RealisticFighter
-                key={player.id}
-                skinId={player.skinPreset}
-                animation="idle"
-                scale={1.05}
+                key={player.id + currentAnim}
+                skinId={player.skinPreset || player.skinId}
+                animation={currentAnim}
+                scale={0.58}
               />
             </group>
           )}
 
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.91, 0]} receiveShadow>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.86, 0]} receiveShadow>
             <planeGeometry args={[20, 20]} />
             <meshStandardMaterial color="#1E1A1D" roughness={0.6} />
           </mesh>

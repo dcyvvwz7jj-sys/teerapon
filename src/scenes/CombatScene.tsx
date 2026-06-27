@@ -42,16 +42,30 @@ export default function CombatScene() {
     const aiAction = chooseAIAction(combatState);
     const result = resolveTurn(combatState, action, aiAction);
 
-    // Trigger dynamic strike animations
+    // Trigger initial dynamic strike animations
     if (action === 'heavy_strike') setPlayerAnim('hook');
     else if (action === 'light_strike') setPlayerAnim('jab');
     else if (action === 'dodge') setPlayerAnim('dodge_left');
     else if (action === 'defend') setPlayerAnim('block');
+    else if (action === 'special') setPlayerAnim('spinning_kick');
 
     if (aiAction === 'heavy_strike') setAiAnim('overhand');
     else if (aiAction === 'light_strike') setAiAnim('cross');
     else if (aiAction === 'dodge') setAiAnim('dodge_right');
     else if (aiAction === 'defend') setAiAnim('block');
+    else if (aiAction === 'special') setAiAnim('spinning_kick');
+
+    // Delayed hit reactions for realism
+    setTimeout(() => {
+      if (result.outcome === 'player_hits' || result.outcome === 'player_counters') {
+        setAiAnim('hit_head');
+      } else if (result.outcome === 'opponent_hits' || result.outcome === 'opponent_counters') {
+        setPlayerAnim('hit_head');
+      } else if (result.outcome === 'both_hit') {
+        setPlayerAnim('hit_body');
+        setAiAnim('hit_body');
+      }
+    }, 450);
 
     applyTurnResult(result);
     setCombatPhase('resolving');
@@ -96,40 +110,40 @@ export default function CombatScene() {
         turn={combatState.turn}
       />
 
-      {/* 3D Combat Arena Canvas */}
+      {/* 3D Combat Arena Canvas (Perfectly positioned & facing inwards) */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <Canvas shadows>
-          <PerspectiveCamera makeDefault position={[0, 1.4, 4.2]} fov={48} />
+          <PerspectiveCamera makeDefault position={[0, 0.2, 4.0]} fov={45} />
           <ArenaLighting />
 
-          {/* Player Fighter (Left) */}
-          <group position={[-1.3, -0.9, 0]} rotation={[0, 0.35, 0]}>
+          {/* Player Fighter (Left facing Right) */}
+          <group position={[-1.1, -0.85, 0]} rotation={[0, 0.85, 0]}>
             <RealisticFighter
-              key={player.id}
+              key={player.id + playerAnim}
               skinId={player.skinPreset || player.skinId}
               animation={playerAnim}
-              scale={1.05}
+              scale={0.55}
             />
           </group>
 
-          {/* AI Opponent (Right) */}
-          <group position={[1.3, -0.9, 0]} rotation={[0, -0.35, 0]}>
+          {/* AI Opponent (Right facing Left) */}
+          <group position={[1.1, -0.85, 0]} rotation={[0, -0.85, 0]}>
             <RealisticFighter
-              key={ai.id}
+              key={ai.id + aiAnim}
               skinId={ai.skinPreset || ai.skinId}
               animation={aiAnim}
               mirror
-              scale={1.05}
+              scale={0.55}
             />
           </group>
 
           {/* Ring Floor */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.91, 0]} receiveShadow>
-            <planeGeometry args={[16, 16]} />
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.86, 0]} receiveShadow>
+            <planeGeometry args={[18, 18]} />
             <meshStandardMaterial color="#11131A" roughness={0.5} metalness={0.2} />
           </mesh>
           {/* Ring Ropes Border */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.9, 0]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.85, 0]}>
             <ringGeometry args={[5.8, 6.0, 32]} />
             <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.5} />
           </mesh>

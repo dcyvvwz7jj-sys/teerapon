@@ -31,15 +31,15 @@ export default function MatchResultScene() {
       {/* 3D Winner Spotlight Canvas */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <Canvas shadows>
-          <PerspectiveCamera makeDefault position={[0, 1.3, 3.2]} fov={45} />
+          <PerspectiveCamera makeDefault position={[0, 0.2, 3.8]} fov={45} />
           <ShowroomLighting />
           
-          <group position={[0, -0.9, 0]}>
+          <group position={[0, -0.85, 0]}>
             <RealisticFighter
               key={winnerFighter.id}
               skinId={winnerFighter.skinPreset || winnerFighter.skinId}
               animation="victory"
-              scale={1.1}
+              scale={0.58}
             />
           </group>
 

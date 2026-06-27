@@ -18,7 +18,7 @@ export function PostProcessingStack({ quality = 'high', combatActive = false }: 
 
   try {
     return (
-      <EffectComposer enableNormalPass={quality === 'high'}>
+      <EffectComposer enableNormalPass={false} multisampling={0}>
         <Bloom
           intensity={0.35}
           luminanceThreshold={0.75}

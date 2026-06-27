@@ -88,6 +88,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         id: generateId(),
         name: name.toUpperCase(),
         skinId,
+        skinPreset: skinId,
+        level: 1,
         ability,
         stats: { punchPower: 1, kickPower: 1, reactionSpeed: 1, endurance: 1 },
         trainingSessions: 0,
