@@ -9,6 +9,7 @@ import {
 } from '@/types/game';
 import { loadSave, saveToDisk } from './SaveSystem';
 import { STAT_MAX, MAX_TRAINING_SESSIONS } from '@/data/constants';
+import { setSFXVolume, setMusicVolume } from './AudioSystem';
 
 // ---- Store Interface ----
 interface GameStore {
@@ -272,6 +273,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   updateSettings: (newSettings) => {
     set((state) => {
       const settings = { ...state.settings, ...newSettings };
+      setSFXVolume(settings.sfxVolume);
+      setMusicVolume(settings.musicVolume);
       saveToDisk({ fighters: state.fighters, settings, version: 2 });
       return { settings };
     });
@@ -281,6 +284,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   initialized: false,
   initializeGame: () => {
     const save = loadSave();
+    setSFXVolume(save.settings.sfxVolume);
+    setMusicVolume(save.settings.musicVolume);
     set({
       fighters: save.fighters,
       settings: save.settings,

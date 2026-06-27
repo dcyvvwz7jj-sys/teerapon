@@ -316,9 +316,32 @@ export function setVolume(volume: number) {
   if (masterGain) masterGain.gain.value = volume;
 }
 
+export function setSFXVolume(vol: number) {
+  if (sfxGain) sfxGain.gain.value = vol;
+}
+
+export function setMusicVolume(vol: number) {
+  if (ambienceGain) ambienceGain.gain.value = vol;
+}
+
+export function playHeavyHitSound(isCritical = true) {
+  playKickSound(isCritical);
+}
+
+export function playLightHitSound(isCritical = false) {
+  playPunchSound(isCritical);
+}
+
+export function playSpecialSound() {
+  playVictorySound();
+}
+
+export function playCountdownTick() {
+  playUIClick();
+}
+
 export function stopAll() {
-  if (actx) {
-    actx.close();
-    actx = null;
+  if (actx && actx.state === 'running') {
+    actx.suspend();
   }
 }
