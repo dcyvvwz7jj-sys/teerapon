@@ -5,6 +5,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TrainingGrade, TrainingResult, TrainingType } from '@/types/game';
+import { playPunchSound, playKickSound, playVictorySound, playUIClick } from '@/systems/AudioSystem';
 
 interface TimingBarGameProps {
   trainingType: 'punch' | 'kick';
@@ -88,6 +89,9 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
   const handleClick = useCallback(() => {
     if (phase !== 'playing' || frozen) return;
 
+    if (trainingType === 'punch') playPunchSound();
+    else playKickSound();
+
     onHitSuccess?.();
     setFrozen(true);
     cancelAnimationFrame(animRef.current);
@@ -112,26 +116,41 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
     }
 
     setLastHitResult(hitResult);
-    setScores((prev) => [...prev, score]);
+    const newScores = [...scores, score];
+    setScores(newScores);
 
     // Next attempt or finish
     setTimeout(() => {
       if (attempt + 1 >= MAX_ATTEMPTS) {
-        setPhase('result');
+        playVictorySound();
+        const bestScore = Math.max(...newScores);
+        const avgScore = newScores.reduce((a, b) => a + b, 0) / newScores.length;
+        const finalScore = Math.round(bestScore * 0.6 + avgScore * 0.4);
+        const grade = getGrade(finalScore);
+        const statGain = getStatGain(grade);
+        onComplete({
+          type: trainingType,
+          grade,
+          statGain,
+          score: finalScore,
+          maxScore: 100,
+        });
       } else {
         setAttempt((prev) => prev + 1);
         setFrozen(false);
       }
-    }, 1200);
-  }, [phase, frozen, cursorPos, sweetSpotStart, sweetSpotWidth, attempt]);
+    }, 1000);
+  }, [phase, frozen, cursorPos, sweetSpotStart, sweetSpotWidth, attempt, scores, trainingType, onComplete, onHitSuccess]);
 
   // Keyboard support
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
-        if (phase === 'ready') setPhase('playing');
-        else handleClick();
+        if (phase === 'ready') {
+          playUIClick();
+          setPhase('playing');
+        } else handleClick();
       }
       if (e.code === 'Escape') onCancel();
     };

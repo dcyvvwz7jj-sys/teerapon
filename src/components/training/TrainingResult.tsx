@@ -5,6 +5,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import type { TrainingResult as TrainingResultType } from '@/types/game';
+import { playUIClick } from '@/systems/AudioSystem';
 
 interface TrainingResultProps {
   result: TrainingResultType;
@@ -70,10 +71,10 @@ export default function TrainingResult({ result, statNameTH, onContinue }: Train
 
       <button
         className="game-btn primary"
-        onClick={onContinue}
-        style={{ fontSize: '20px', padding: '16px 48px' }}
+        onClick={() => { playUIClick(); onContinue(); }}
+        style={{ fontSize: '20px', padding: '16px 48px', cursor: 'pointer' }}
       >
-        ดำเนินการต่อ
+        ดำเนินการต่อ (ตกลง)
       </button>
     </motion.div>
   );

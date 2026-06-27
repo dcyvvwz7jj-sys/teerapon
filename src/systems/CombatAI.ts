@@ -43,6 +43,10 @@ export function chooseAIAction(combatState: CombatState, isPlayerAttacker?: bool
     weights.dodge = 0;
   }
 
+  if (combatState.aiSpecialUsed === true) {
+    weights.special = 0;
+  }
+
   // HP-aware Adjustments
   const aiHPPercent = combatState.opponentHP / combatState.opponentMaxHP;
   const playerHPPercent = combatState.playerHP / combatState.playerMaxHP;

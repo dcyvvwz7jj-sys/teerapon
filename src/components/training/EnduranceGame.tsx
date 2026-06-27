@@ -5,6 +5,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TrainingGrade, TrainingResult } from '@/types/game';
+import { playUIClick, playVictorySound, playPunchSound } from '@/systems/AudioSystem';
 
 interface EnduranceGameProps {
   currentStatLevel: number;
@@ -59,6 +60,7 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
   const handleClick = useCallback(() => {
     if (phase !== 'playing') return;
 
+    playPunchSound();
     onHitSuccess?.();
     const now = performance.now();
     const timeSinceLast = now - lastClickRef.current;
@@ -108,7 +110,24 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
       });
 
       if (remaining <= 0) {
-        setPhase('result');
+        playVictorySound();
+        setTotalSamples((currentTotal) => {
+          setGreenTime((currentGreen) => {
+            const greenPercentage = currentTotal > 0 ? (currentGreen / currentTotal) * 100 : 0;
+            const finalScore = Math.round(greenPercentage);
+            const grade = getGrade(finalScore);
+            const statGain = getStatGain(grade);
+            onComplete({
+              type: 'endurance',
+              grade,
+              statGain,
+              score: finalScore,
+              maxScore: 100,
+            });
+            return currentGreen;
+          });
+          return currentTotal;
+        });
         return;
       }
 
@@ -125,6 +144,7 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
       if (e.code === 'Escape') { onCancel(); return; }
       if (phase === 'ready' && (e.code === 'Space' || e.code === 'Enter')) {
         e.preventDefault();
+        playUIClick();
         setPhase('playing');
         return;
       }

@@ -6,12 +6,14 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { CombatAction, AbilityId } from '@/types/game';
 import { ABILITIES } from '@/data/constants';
+import { playUIClick } from '@/systems/AudioSystem';
 
 interface ActionSelectorProps {
   onSelectAction: (action: CombatAction) => void;
   abilityId: AbilityId;
   disabled?: boolean;
   isPlayerAttacker?: boolean;
+  playerSpecialUsed?: boolean;
 }
 
 const ACTION_CONFIG: Record<CombatAction, { label: string; icon: string; desc: string; color: string }> = {
@@ -24,7 +26,7 @@ const ACTION_CONFIG: Record<CombatAction, { label: string; icon: string; desc: s
 
 const ACTIONS: CombatAction[] = ['heavy_strike', 'light_strike', 'defend', 'dodge', 'special'];
 
-export default function ActionSelector({ onSelectAction, abilityId, disabled = false, isPlayerAttacker }: ActionSelectorProps) {
+export default function ActionSelector({ onSelectAction, abilityId, disabled = false, isPlayerAttacker, playerSpecialUsed }: ActionSelectorProps) {
   const [selected, setSelected] = useState<CombatAction | null>(null);
   const [timeLeft, setTimeLeft] = useState(15);
 
@@ -55,6 +57,7 @@ export default function ActionSelector({ onSelectAction, abilityId, disabled = f
 
   const handleConfirm = () => {
     if (!selected || disabled) return;
+    playUIClick();
     onSelectAction(selected);
   };
 
@@ -86,26 +89,32 @@ export default function ActionSelector({ onSelectAction, abilityId, disabled = f
           const cfg = ACTION_CONFIG[act];
           const isSelected = selected === act;
           const isSpecial = act === 'special';
+          const isBtnDisabled = disabled || (isSpecial && playerSpecialUsed === true);
 
           return (
             <motion.button
               key={act}
-              whileHover={{ scale: disabled ? 1 : 1.05 }}
-              whileTap={{ scale: disabled ? 1 : 0.95 }}
-              onClick={() => !disabled && setSelected(act)}
-              disabled={disabled}
+              whileHover={{ scale: isBtnDisabled ? 1 : 1.05 }}
+              whileTap={{ scale: isBtnDisabled ? 1 : 0.95 }}
+              onClick={() => {
+                if (!isBtnDisabled) {
+                  playUIClick();
+                  setSelected(act);
+                }
+              }}
+              disabled={isBtnDisabled}
               style={{
-                flex: 1, padding: '16px 12px', borderRadius: '12px', cursor: disabled ? 'not-allowed' : 'pointer',
+                flex: 1, padding: '16px 12px', borderRadius: '12px', cursor: isBtnDisabled ? 'not-allowed' : 'pointer',
                 background: isSelected ? `${cfg.color}30` : 'rgba(255,255,255,0.05)',
                 border: `2px solid ${isSelected ? cfg.color : 'rgba(255,255,255,0.1)'}`,
                 boxShadow: isSelected ? `0 0 16px ${cfg.color}60` : 'none',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-                transition: 'all 0.2s', opacity: disabled ? 0.5 : 1,
+                transition: 'all 0.2s', opacity: isBtnDisabled ? 0.4 : 1,
               }}
             >
               <span style={{ fontSize: '28px' }}>{isSpecial && ability ? ability.icon : cfg.icon}</span>
               <span style={{ fontFamily: 'Inter', fontWeight: 700, fontSize: '15px', color: isSelected ? cfg.color : '#FFFFFF' }}>
-                {isSpecial && ability ? ability.nameTH : cfg.label}
+                {isSpecial && ability ? (playerSpecialUsed ? `${ability.nameTH} (ใช้แล้ว)` : ability.nameTH) : cfg.label}
               </span>
             </motion.button>
           );

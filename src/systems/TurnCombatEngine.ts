@@ -91,24 +91,24 @@ export function resolveTurn(
     const stat = isHeavy ? attacker.stats.punchPower : attacker.stats.kickPower;
     let base = (stat * 3) + getRandomInt(5, 15);
 
-    if (isHeavy) base *= 1.5;
-    else base *= 0.8;
+    if (isHeavy) base *= 1.25;
+    else base *= 0.85;
 
-    if (isCounter) base *= 1.5;
+    if (isCounter) base *= 1.35;
 
     // Crit check
     const critChance = attacker.stats.reactionSpeed * 0.02; // max 14%
     const isCrit = Math.random() < critChance;
-    if (isCrit) base *= 1.8;
+    if (isCrit) base *= 1.5;
 
     // Ability Modifiers
-    if (attacker.ability === 'crushing_blow' && isHeavy) base *= 1.4;
-    if (attacker.ability === 'afterimage' && isCounter) base *= 2.0;
-    if (attacker.ability === 'wildfire' && !isHeavy) base *= 1.5; // hits twice simulation
+    if (attacker.ability === 'crushing_blow' && isHeavy) base *= 1.2;
+    if (attacker.ability === 'afterimage' && isCounter) base *= 1.35;
+    if (attacker.ability === 'wildfire' && !isHeavy) base *= 1.25;
     if (attacker.ability === 'blood_rage') {
       const currentHP = attacker.id === player.id ? combatState.playerHP : combatState.opponentHP;
       const maxHP = attacker.id === player.id ? combatState.playerMaxHP : combatState.opponentMaxHP;
-      if (currentHP / maxHP < 0.3) base *= 1.6;
+      if (currentHP / maxHP < 0.3) base *= 1.35;
     }
 
     // Defensive reductions
@@ -161,15 +161,15 @@ export function resolveTurn(
   let descEN = 'Stalemate! No damage dealt!';
 
   if (miracleComebackPlayer) {
-    playerDamageDealt = Math.round(Math.max(45, (player.stats.punchPower + player.stats.kickPower) * 12 * 2.3));
+    playerDamageDealt = Math.round(Math.max(35, (player.stats.punchPower + player.stats.kickPower) * 6 * 1.35));
     critOccurred = true;
-    descTH = `🎲✨ ดวงปาฏิหาริย์! ${player.name} ระเบิดพลังพิเศษพลิกสถานการณ์ทำลายการ์ดสำเร็จ! ทำดาเมจมหาศาล ${playerDamageDealt}`;
-    descEN = `🎲✨ Miracle Comeback! ${player.name} unleashes special luck to crush the guard for ${playerDamageDealt} dmg!`;
+    descTH = `🎲✨ ดวงปาฏิหาริย์! ${player.name} ระเบิดท่าไม้ตายพลิกสถานการณ์ทำลายการ์ดสำเร็จ! ทำดาเมจ ${playerDamageDealt}`;
+    descEN = `🎲✨ Miracle Comeback! ${player.name} unleashes ultimate power to crush the guard for ${playerDamageDealt} dmg!`;
   } else if (miracleComebackAi) {
-    playerDamageTaken = Math.round(Math.max(45, (ai.stats.punchPower + ai.stats.kickPower) * 12 * 2.3));
+    playerDamageTaken = Math.round(Math.max(35, (ai.stats.punchPower + ai.stats.kickPower) * 6 * 1.35));
     critOccurred = true;
-    descTH = `🎲✨ ปาฏิหาริย์เกิดขึ้น! ${ai.name} วัดดวงสำเร็จ ระเบิดสกิลพลิกเกมสวนกลับ! ทำดาเมจ ${playerDamageTaken}`;
-    descEN = `🎲✨ Miracle Comeback! ${ai.name} rolls lucky special power to counter for ${playerDamageTaken} dmg!`;
+    descTH = `🎲✨ ปาฏิหาริย์เกิดขึ้น! ${ai.name} วัดดวงสำเร็จ ระเบิดท่าไม้ตายสวนกลับ! ทำดาเมจ ${playerDamageTaken}`;
+    descEN = `🎲✨ Miracle Comeback! ${ai.name} unleashes ultimate power to counter for ${playerDamageTaken} dmg!`;
   } else if (outcome === 'player_hits') {
     descTH = `${player.name} โจมตีเข้าเป้าอย่างจัง! ทำดาเมจ ${playerDamageDealt}`;
     descEN = `${player.name} lands a clean strike for ${playerDamageDealt} dmg!`;

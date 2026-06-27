@@ -154,6 +154,8 @@ export interface CombatState {
   sageTurnsElapsed: number;
   sageCanReadMind: boolean;
   revealedAIAction: CombatAction | null; // For SAGE mind read
+  playerSpecialUsed?: boolean;
+  aiSpecialUsed?: boolean;
 }
 
 // --- Training Minigame ---

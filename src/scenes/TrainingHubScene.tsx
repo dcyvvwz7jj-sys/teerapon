@@ -14,6 +14,7 @@ import TimingBarGame from '@/components/training/TimingBarGame';
 import QTEGame from '@/components/training/QTEGame';
 import EnduranceGame from '@/components/training/EnduranceGame';
 import TrainingResult from '@/components/training/TrainingResult';
+import { playUIClick } from '@/systems/AudioSystem';
 import type { TrainingResult as TrainingResultType } from '@/types/game';
 import { ABILITIES, MAX_TRAINING_SESSIONS } from '@/data/constants';
 
@@ -185,7 +186,7 @@ export default function TrainingHubScene() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: 'auto' }}>
           <button
-            onClick={() => sessionsLeft > 0 && setActiveGame('punch')}
+            onClick={() => { if (sessionsLeft > 0) { playUIClick(); setActiveGame('punch'); } }}
             disabled={sessionsLeft <= 0}
             style={{
               padding: '16px', borderRadius: '12px', textAlign: 'left', cursor: sessionsLeft > 0 ? 'pointer' : 'not-allowed',
@@ -201,7 +202,7 @@ export default function TrainingHubScene() {
           </button>
 
           <button
-            onClick={() => sessionsLeft > 0 && setActiveGame('kick')}
+            onClick={() => { if (sessionsLeft > 0) { playUIClick(); setActiveGame('kick'); } }}
             disabled={sessionsLeft <= 0}
             style={{
               padding: '16px', borderRadius: '12px', textAlign: 'left', cursor: sessionsLeft > 0 ? 'pointer' : 'not-allowed',
@@ -217,7 +218,7 @@ export default function TrainingHubScene() {
           </button>
 
           <button
-            onClick={() => sessionsLeft > 0 && setActiveGame('reaction')}
+            onClick={() => { if (sessionsLeft > 0) { playUIClick(); setActiveGame('reaction'); } }}
             disabled={sessionsLeft <= 0}
             style={{
               padding: '16px', borderRadius: '12px', textAlign: 'left', cursor: sessionsLeft > 0 ? 'pointer' : 'not-allowed',
@@ -233,7 +234,7 @@ export default function TrainingHubScene() {
           </button>
 
           <button
-            onClick={() => sessionsLeft > 0 && setActiveGame('endurance')}
+            onClick={() => { if (sessionsLeft > 0) { playUIClick(); setActiveGame('endurance'); } }}
             disabled={sessionsLeft <= 0}
             style={{
               padding: '16px', borderRadius: '12px', textAlign: 'left', cursor: sessionsLeft > 0 ? 'pointer' : 'not-allowed',

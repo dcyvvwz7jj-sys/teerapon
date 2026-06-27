@@ -227,6 +227,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? 3 : Math.max(0, cs.blazeDoTTurnsRemaining - 1),
           blazeDoTDamage: result.specialTriggered === 'wildfire'
             ? 5 : cs.blazeDoTDamage,
+          playerSpecialUsed: result.playerAction === 'special' ? true : cs.playerSpecialUsed,
+          aiSpecialUsed: result.aiAction === 'special' ? true : cs.aiSpecialUsed,
         },
       };
     });

@@ -15,6 +15,7 @@ import ActionSelector from '@/components/combat/ActionSelector';
 import TurnResolver from '@/components/combat/TurnResolver';
 import { chooseAIAction } from '@/systems/CombatAI';
 import { resolveTurn } from '@/systems/TurnCombatEngine';
+import { playPunchSound, playKickSound, playVictorySound, playDefeatSound, playUIClick } from '@/systems/AudioSystem';
 import type { CombatAction } from '@/types/game';
 
 export default function CombatScene() {
@@ -46,6 +47,7 @@ export default function CombatScene() {
   const isPlayerAttacker = combatState.turn % 2 === 1;
 
   const handleSelectAction = (action: CombatAction) => {
+    playUIClick();
     const aiAction = chooseAIAction(combatState, isPlayerAttacker);
     const result = resolveTurn(combatState, action, aiAction);
 
@@ -66,11 +68,16 @@ export default function CombatScene() {
     setTimeout(() => {
       if (result.outcome === 'player_hits' || result.outcome === 'player_counters') {
         setAiAnim('hit_head');
+        playPunchSound(result.isCritical);
       } else if (result.outcome === 'opponent_hits' || result.outcome === 'opponent_counters') {
         setPlayerAnim('hit_head');
+        playKickSound(result.isCritical);
       } else if (result.outcome === 'both_hit') {
         setPlayerAnim('hit_body');
         setAiAnim('hit_body');
+        playKickSound(true);
+      } else {
+        playUIClick();
       }
     }, 450);
 
@@ -86,6 +93,7 @@ export default function CombatScene() {
     if (combatState.opponentHP <= 0) {
       setAiAnim('defeat');
       setPlayerAnim('victory');
+      playVictorySound();
       setTimeout(() => {
         endCombat('player', 'KO');
         setScene('match_result');
@@ -93,6 +101,7 @@ export default function CombatScene() {
     } else if (combatState.playerHP <= 0) {
       setPlayerAnim('defeat');
       setAiAnim('victory');
+      playDefeatSound();
       setTimeout(() => {
         endCombat('opponent', 'KO');
         setScene('match_result');
@@ -174,6 +183,7 @@ export default function CombatScene() {
           onSelectAction={handleSelectAction}
           disabled={combatState.phase === 'intro'}
           isPlayerAttacker={isPlayerAttacker}
+          playerSpecialUsed={combatState.playerSpecialUsed}
         />
       )}
 

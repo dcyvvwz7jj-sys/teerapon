@@ -5,6 +5,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TrainingGrade, TrainingResult } from '@/types/game';
+import { playUIClick, playVictorySound, playPunchSound } from '@/systems/AudioSystem';
 
 interface QTEGameProps {
   currentStatLevel: number;
@@ -109,6 +110,7 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel, onHitS
 
       if (config.keys.includes(e.code)) {
         // Correct!
+        playPunchSound();
         setResults((prev) => [...prev, { correct: true, time: elapsed }]);
         setFeedbackType('correct');
       } else {
@@ -129,18 +131,34 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel, onHitS
 
     const timer = setTimeout(() => {
       if (promptIndex + 1 >= TOTAL_PROMPTS) {
-        setPhase('result');
+        playVictorySound();
+        const correctCount = results.filter((r) => r.correct).length;
+        const avgReactionTime = correctCount > 0
+          ? results.filter((r) => r.correct).reduce((a, b) => a + b.time, 0) / correctCount
+          : timeWindow;
+        const accuracyScore = (correctCount / TOTAL_PROMPTS) * 70;
+        const speedBonus = Math.max(0, 30 - (avgReactionTime / timeWindow) * 30);
+        const perfectBonus = correctCount === TOTAL_PROMPTS ? 10 : 0;
+        const finalScore = Math.min(100, Math.round(accuracyScore + speedBonus + perfectBonus));
+        const grade = getGrade(finalScore);
+        const statGain = getStatGain(grade);
+        onComplete({
+          type: 'reaction',
+          grade,
+          statGain,
+          score: finalScore,
+          maxScore: 100,
+        });
       } else {
         setPromptIndex((p) => p + 1);
         setFeedbackType(null);
         setPhase('waiting');
-        // Random delay before next prompt
         setTimeout(generatePrompt, 300 + Math.random() * 600);
       }
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [phase, promptIndex, generatePrompt]);
+  }, [phase, promptIndex, generatePrompt, results, timeWindow, onComplete]);
 
   // Calculate final score
   const correctCount = results.filter((r) => r.correct).length;
