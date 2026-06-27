@@ -11,6 +11,7 @@ interface TimingBarGameProps {
   currentStatLevel: number; // 0–7
   onComplete: (result: TrainingResult) => void;
   onCancel: () => void;
+  onHitSuccess?: () => void;
 }
 
 function getGrade(score: number): TrainingGrade {
@@ -31,7 +32,7 @@ function getStatGain(grade: TrainingGrade): number {
   }
 }
 
-export default function TimingBarGame({ trainingType, currentStatLevel, onComplete, onCancel }: TimingBarGameProps) {
+export default function TimingBarGame({ trainingType, currentStatLevel, onComplete, onCancel, onHitSuccess }: TimingBarGameProps) {
   const [phase, setPhase] = useState<'ready' | 'playing' | 'result'>('ready');
   const [attempt, setAttempt] = useState(0);
   const [cursorPos, setCursorPos] = useState(0); // 0–100
@@ -109,6 +110,9 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
       hitResult = 'miss';
     }
 
+    if (hitResult === 'perfect' || hitResult === 'good') {
+      onHitSuccess?.();
+    }
     setLastHitResult(hitResult);
     setScores((prev) => [...prev, score]);
 
@@ -160,9 +164,10 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
 
   return (
     <div style={{
-      position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+      position: 'absolute', bottom: 0, left: 0, right: 0, height: '280px', display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', zIndex: 50,
-      background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)',
+      background: 'rgba(15, 15, 22, 0.95)', borderTop: `2px solid ${accentColor}`,
+      boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '16px',
     }}>
       <AnimatePresence mode="wait">
         {phase === 'ready' && (

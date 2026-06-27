@@ -10,6 +10,7 @@ interface EnduranceGameProps {
   currentStatLevel: number;
   onComplete: (result: TrainingResult) => void;
   onCancel: () => void;
+  onHitSuccess?: () => void;
 }
 
 function getGrade(score: number): TrainingGrade {
@@ -37,7 +38,7 @@ const ZONE_RED = { min: 70, max: 100, color: '#EF4444', label: 'เร็วเ�
 
 const GAME_DURATION = 15; // seconds
 
-export default function EnduranceGame({ currentStatLevel, onComplete, onCancel }: EnduranceGameProps) {
+export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, onHitSuccess }: EnduranceGameProps) {
   const [phase, setPhase] = useState<'ready' | 'playing' | 'result'>('ready');
   const [gauge, setGauge] = useState(50); // 0–100
   const [timeRemaining, setTimeRemaining] = useState(GAME_DURATION);
@@ -65,7 +66,13 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel }
     // Rapid clicking = more gauge overshoot
     const clickSpeed = timeSinceLast < 150 ? overchargeRate : 0;
 
-    setGauge((prev) => Math.min(100, prev + boostPerClick + clickSpeed));
+    setGauge((prev) => {
+      const next = Math.min(100, prev + boostPerClick + clickSpeed);
+      if (next >= ZONE_GREEN.min && next <= ZONE_GREEN.max) {
+        onHitSuccess?.();
+      }
+      return next;
+    });
     setClickBurst(true);
     setTimeout(() => setClickBurst(false), 100);
 
@@ -159,9 +166,10 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel }
     <div
       onClick={phase === 'playing' ? handleClick : undefined}
       style={{
-        position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '280px', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', zIndex: 50,
-        background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(8px)',
+        background: 'rgba(15, 15, 22, 0.95)', borderTop: '2px solid #22C55E',
+        boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '16px',
         cursor: phase === 'playing' ? 'pointer' : 'default',
         userSelect: 'none',
       }}

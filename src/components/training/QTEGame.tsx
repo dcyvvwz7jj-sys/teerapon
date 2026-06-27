@@ -10,6 +10,7 @@ interface QTEGameProps {
   currentStatLevel: number;
   onComplete: (result: TrainingResult) => void;
   onCancel: () => void;
+  onHitSuccess?: () => void;
 }
 
 type Direction = 'left' | 'right' | 'up' | 'down';
@@ -41,7 +42,7 @@ function getStatGain(grade: TrainingGrade): number {
   }
 }
 
-export default function QTEGame({ currentStatLevel, onComplete, onCancel }: QTEGameProps) {
+export default function QTEGame({ currentStatLevel, onComplete, onCancel, onHitSuccess }: QTEGameProps) {
   const [phase, setPhase] = useState<'ready' | 'playing' | 'waiting' | 'feedback' | 'result'>('ready');
   const [promptIndex, setPromptIndex] = useState(0);
   const [currentDirection, setCurrentDirection] = useState<Direction>('up');
@@ -104,6 +105,7 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel }: QTEG
 
       if (config.keys.includes(e.code)) {
         // Correct!
+        onHitSuccess?.();
         setResults((prev) => [...prev, { correct: true, time: elapsed }]);
         setFeedbackType('correct');
       } else {
@@ -169,9 +171,10 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel }: QTEG
 
   return (
     <div style={{
-      position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+      position: 'absolute', bottom: 0, left: 0, right: 0, height: '280px', display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', zIndex: 50,
-      background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(8px)',
+      background: 'rgba(15, 15, 22, 0.95)', borderTop: '2px solid #00BFFF',
+      boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '16px',
     }}>
       <AnimatePresence mode="wait">
         {phase === 'ready' && (

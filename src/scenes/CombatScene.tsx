@@ -43,9 +43,10 @@ export default function CombatScene() {
 
   const player = combatState.playerFighter;
   const ai = combatState.opponentFighter;
+  const isPlayerAttacker = combatState.turn % 2 === 1;
 
   const handleSelectAction = (action: CombatAction) => {
-    const aiAction = chooseAIAction(combatState);
+    const aiAction = chooseAIAction(combatState, isPlayerAttacker);
     const result = resolveTurn(combatState, action, aiAction);
 
     // Trigger logical attack/defense animations
@@ -172,6 +173,7 @@ export default function CombatScene() {
           abilityId={player.ability}
           onSelectAction={handleSelectAction}
           disabled={combatState.phase === 'intro'}
+          isPlayerAttacker={isPlayerAttacker}
         />
       )}
 

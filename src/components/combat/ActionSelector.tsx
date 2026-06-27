@@ -11,6 +11,7 @@ interface ActionSelectorProps {
   onSelectAction: (action: CombatAction) => void;
   abilityId: AbilityId;
   disabled?: boolean;
+  isPlayerAttacker?: boolean;
 }
 
 const ACTION_CONFIG: Record<CombatAction, { label: string; icon: string; desc: string; color: string }> = {
@@ -23,11 +24,19 @@ const ACTION_CONFIG: Record<CombatAction, { label: string; icon: string; desc: s
 
 const ACTIONS: CombatAction[] = ['heavy_strike', 'light_strike', 'defend', 'dodge', 'special'];
 
-export default function ActionSelector({ onSelectAction, abilityId, disabled = false }: ActionSelectorProps) {
+export default function ActionSelector({ onSelectAction, abilityId, disabled = false, isPlayerAttacker }: ActionSelectorProps) {
   const [selected, setSelected] = useState<CombatAction | null>(null);
   const [timeLeft, setTimeLeft] = useState(15);
 
   const ability = ABILITIES.find((a) => a.id === abilityId);
+
+  const availableActions: CombatAction[] = isPlayerAttacker === true
+    ? ['heavy_strike', 'light_strike', 'special']
+    : isPlayerAttacker === false
+    ? ['defend', 'dodge', 'special']
+    : ACTIONS;
+
+  const fallbackAction: CombatAction = isPlayerAttacker === true ? 'light_strike' : 'defend';
 
   useEffect(() => {
     if (disabled) return;
@@ -35,8 +44,7 @@ export default function ActionSelector({ onSelectAction, abilityId, disabled = f
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          // Auto select Defend on timeout
-          onSelectAction(selected || 'defend');
+          onSelectAction(selected || fallbackAction);
           return 0;
         }
         return prev - 1;
@@ -64,8 +72,8 @@ export default function ActionSelector({ onSelectAction, abilityId, disabled = f
     >
       {/* Top Header & Timer */}
       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '800px', marginBottom: '16px', alignItems: 'center' }}>
-        <div style={{ fontFamily: 'Orbitron', fontSize: '18px', color: '#FFFFFF' }}>
-          เลือกการกระทำในเทิร์นนี้
+        <div style={{ fontFamily: 'Orbitron', fontSize: '18px', fontWeight: 800, color: isPlayerAttacker === true ? '#FF4444' : isPlayerAttacker === false ? '#3B82F6' : '#FFFFFF' }}>
+          {isPlayerAttacker === true ? '💥 เทิร์นเราโจมตี (YOUR ATTACK TURN)' : isPlayerAttacker === false ? '🛡️ เทิร์นเราป้องกัน (YOUR DEFENSE TURN)' : 'เลือกการกระทำในเทิร์นนี้'}
         </div>
         <div style={{ fontFamily: 'Orbitron', fontSize: '20px', fontWeight: 800, color: timeLeft <= 3 ? '#EF4444' : '#EAB308' }}>
           ⏱️ {timeLeft}s
@@ -74,7 +82,7 @@ export default function ActionSelector({ onSelectAction, abilityId, disabled = f
 
       {/* Action Buttons Grid */}
       <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '800px', marginBottom: '20px' }}>
-        {ACTIONS.map((act) => {
+        {availableActions.map((act) => {
           const cfg = ACTION_CONFIG[act];
           const isSelected = selected === act;
           const isSpecial = act === 'special';

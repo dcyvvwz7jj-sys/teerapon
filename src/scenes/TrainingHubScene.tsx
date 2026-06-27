@@ -34,7 +34,13 @@ export default function TrainingHubScene() {
   const [activeGame, setActiveGame] = useState<MinigameType>(null);
   const [lastResult, setLastResult] = useState<TrainingResultType | null>(null);
   const [showcaseAnim, setShowcaseAnim] = useState<string | null>(null);
+  const [hitAnimTrigger, setHitAnimTrigger] = useState<string | null>(null);
   const [showOpponentSelect, setShowOpponentSelect] = useState(false);
+
+  const triggerHitAnim = (anim: string) => {
+    setHitAnimTrigger(anim);
+    setTimeout(() => setHitAnimTrigger(null), 600);
+  };
 
   const handleMinigameComplete = (res: TrainingResultType) => {
     // Trigger cool training showcase animation
@@ -69,13 +75,9 @@ export default function TrainingHubScene() {
   let currentAnim = 'idle';
   if (showcaseAnim) {
     currentAnim = showcaseAnim;
-  } else if (activeGame === 'punch') {
-    currentAnim = 'jab';
-  } else if (activeGame === 'kick') {
-    currentAnim = 'low_kick';
-  } else if (activeGame === 'reaction') {
-    currentAnim = 'dodge_right';
-  } else if (activeGame === 'endurance') {
+  } else if (hitAnimTrigger) {
+    currentAnim = hitAnimTrigger;
+  } else if (activeGame) {
     currentAnim = 'guard';
   }
 
@@ -305,16 +307,16 @@ export default function TrainingHubScene() {
 
       {/* Minigame Overlays */}
       {activeGame === 'punch' && player && (
-        <TimingBarGame trainingType="punch" currentStatLevel={player.stats.punchPower} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} />
+        <TimingBarGame trainingType="punch" currentStatLevel={player.stats.punchPower} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} onHitSuccess={() => triggerHitAnim('hook')} />
       )}
       {activeGame === 'kick' && player && (
-        <TimingBarGame trainingType="kick" currentStatLevel={player.stats.kickPower} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} />
+        <TimingBarGame trainingType="kick" currentStatLevel={player.stats.kickPower} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} onHitSuccess={() => triggerHitAnim('roundhouse')} />
       )}
       {activeGame === 'reaction' && player && (
-        <QTEGame currentStatLevel={player.stats.reactionSpeed} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} />
+        <QTEGame currentStatLevel={player.stats.reactionSpeed} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} onHitSuccess={() => triggerHitAnim('dodge_left')} />
       )}
       {activeGame === 'endurance' && player && (
-        <EnduranceGame currentStatLevel={player.stats.endurance} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} />
+        <EnduranceGame currentStatLevel={player.stats.endurance} onComplete={handleMinigameComplete} onCancel={() => setActiveGame(null)} onHitSuccess={() => triggerHitAnim('block')} />
       )}
 
       {/* Result Overlay */}
