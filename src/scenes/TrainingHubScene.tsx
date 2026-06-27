@@ -1,6 +1,6 @@
 'use client';
 // ============================================================
-// LEARN FIGHT — Training Hub Scene
+// LEARN FIGHT — Training Hub Scene (Rich Gym & Showcase)
 // ============================================================
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
@@ -8,6 +8,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useGameStore } from '@/systems/GameStore';
 import { RealisticFighter } from '@/components/three/RealisticFighter';
 import { GymLighting } from '@/components/three/AdvancedLighting';
+import { GymEnvironment } from '@/components/three/ArenaBackgrounds';
 import StatBar from '@/components/ui/StatBar';
 import TimingBarGame from '@/components/training/TimingBarGame';
 import QTEGame from '@/components/training/QTEGame';
@@ -32,8 +33,20 @@ export default function TrainingHubScene() {
 
   const [activeGame, setActiveGame] = useState<MinigameType>(null);
   const [lastResult, setLastResult] = useState<TrainingResultType | null>(null);
+  const [showcaseAnim, setShowcaseAnim] = useState<string | null>(null);
+  const [showOpponentSelect, setShowOpponentSelect] = useState(false);
 
   const handleMinigameComplete = (res: TrainingResultType) => {
+    // Trigger cool training showcase animation
+    if (res.type === 'punch') setShowcaseAnim('hook');
+    else if (res.type === 'kick') setShowcaseAnim('spinning_kick');
+    else if (res.type === 'reaction') setShowcaseAnim('dodge_left');
+    else if (res.type === 'endurance') setShowcaseAnim('guard');
+
+    setTimeout(() => {
+      setShowcaseAnim('victory');
+    }, 2000);
+
     setLastResult(res);
   };
 
@@ -42,31 +55,31 @@ export default function TrainingHubScene() {
     applyTrainingResult(lastResult);
     setLastResult(null);
     setActiveGame(null);
+    setShowcaseAnim(null);
   };
 
-  const handleStartFight = () => {
+  const handleSelectOpponentAndFight = (aiId: string) => {
     if (!player) return;
-    const availableAIs = fighters.filter((f) => f.id !== player.id);
-    const ai = availableAIs[Math.floor(Math.random() * availableAIs.length)] || fighters[0];
-    
-    selectOpponent(ai.id);
-    startCombat(player.id, ai.id);
+    selectOpponent(aiId);
+    startCombat(player.id, aiId);
     setScene('combat');
   };
 
   // Dynamic 3D Animation based on training state
   let currentAnim = 'idle';
-  if (lastResult) {
-    currentAnim = 'victory';
+  if (showcaseAnim) {
+    currentAnim = showcaseAnim;
   } else if (activeGame === 'punch') {
-    currentAnim = 'light_attack';
+    currentAnim = 'jab';
   } else if (activeGame === 'kick') {
     currentAnim = 'low_kick';
   } else if (activeGame === 'reaction') {
-    currentAnim = 'dodge';
+    currentAnim = 'dodge_right';
   } else if (activeGame === 'endurance') {
-    currentAnim = 'defend';
+    currentAnim = 'guard';
   }
+
+  const availableOpponents = fighters.filter((f) => f.id !== player?.id);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#0D0D12', display: 'flex', overflow: 'hidden' }}>
@@ -118,11 +131,22 @@ export default function TrainingHubScene() {
         </button>
       </div>
 
-      {/* Center Panel: 3D Gym View (Perfectly scaled & centered) */}
+      {/* Center Panel: 3D Gym View with Rich Environment & Dynamic Showcase */}
       <div style={{ flex: 1, height: '100%', position: 'relative' }}>
+        {showcaseAnim && (
+          <div style={{
+            position: 'absolute', top: 20, left: 0, right: 0, zIndex: 20, textAlign: 'center', pointerEvents: 'none',
+          }}>
+            <h2 style={{ fontFamily: 'Orbitron', fontSize: '36px', color: '#FFD700', textShadow: '0 0 20px #FF8C00', margin: 0 }}>
+              ✨ PERFECT TRAINING FORM!
+            </h2>
+          </div>
+        )}
+
         <Canvas shadows>
-          <PerspectiveCamera makeDefault position={[0, 0.2, 3.8]} fov={45} />
+          <PerspectiveCamera makeDefault position={showcaseAnim ? [0, 0.3, 3.0] : [0, 0.2, 3.8]} fov={45} />
           <GymLighting />
+          <GymEnvironment />
           
           {player && (
             <group position={[0, -0.85, 0]}>
@@ -135,12 +159,7 @@ export default function TrainingHubScene() {
             </group>
           )}
 
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.86, 0]} receiveShadow>
-            <planeGeometry args={[20, 20]} />
-            <meshStandardMaterial color="#1E1A1D" roughness={0.6} />
-          </mesh>
-
-          <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.8} maxPolarAngle={Math.PI / 2 + 0.05} minPolarAngle={Math.PI / 3} />
+          <OrbitControls enableZoom={false} enablePan={false} autoRotate={!showcaseAnim} autoRotateSpeed={1.2} maxPolarAngle={Math.PI / 2 + 0.05} minPolarAngle={Math.PI / 3} />
         </Canvas>
       </div>
 
@@ -223,9 +242,9 @@ export default function TrainingHubScene() {
           </button>
         </div>
 
-        {/* Big Fight Button */}
+        {/* Big Fight Button opens Opponent Selector Modal */}
         <button
-          onClick={handleStartFight}
+          onClick={() => setShowOpponentSelect(true)}
           className="game-btn primary"
           style={{
             width: '100%', padding: '20px', fontSize: '20px', fontFamily: 'Orbitron', fontWeight: 800,
@@ -236,6 +255,53 @@ export default function TrainingHubScene() {
           🔥 เข้าสู่ลานประลอง (FIGHT!)
         </button>
       </div>
+
+      {/* Opponent Selection Modal */}
+      {showOpponentSelect && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px',
+        }}>
+          <div style={{
+            background: '#151520', border: '2px solid #FF0055', borderRadius: '16px', padding: '32px',
+            width: '100%', maxWidth: '800px', maxHeight: '80vh', overflowY: 'auto', display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontFamily: 'Orbitron', fontSize: '28px', color: '#FFFFFF', margin: 0 }}>🎯 เลือกคู่ต่อสู้ของคุณ</h2>
+              <button
+                onClick={() => setShowOpponentSelect(false)}
+                style={{ background: 'none', border: 'none', color: '#FF4444', fontSize: '28px', cursor: 'pointer' }}
+              >✕</button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+              {availableOpponents.map((opp) => {
+                const oppAbility = ABILITIES.find((a) => a.id === opp.ability);
+                return (
+                  <div
+                    key={opp.id}
+                    onClick={() => handleSelectOpponentAndFight(opp.id)}
+                    style={{
+                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px',
+                      padding: '20px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', textAlign: 'center',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#FF0055')}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)')}
+                  >
+                    <div style={{ fontSize: '48px', marginBottom: '12px' }}>🤖</div>
+                    <div style={{ fontFamily: 'Orbitron', fontSize: '18px', fontWeight: 700, color: '#FFFFFF' }}>{opp.name}</div>
+                    <div style={{ fontSize: '12px', color: '#FF8C00', marginBottom: '12px' }}>ระดับ {opp.level} Fighter</div>
+                    <div style={{ fontSize: '12px', color: '#A855F7', background: 'rgba(168,85,247,0.1)', padding: '6px 12px', borderRadius: '12px', width: '100%' }}>
+                      ✨ {oppAbility?.nameTH || 'สกิลพิเศษ'}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Minigame Overlays */}
       {activeGame === 'punch' && player && (
@@ -252,7 +318,7 @@ export default function TrainingHubScene() {
       )}
 
       {/* Result Overlay */}
-      {lastResult && (
+      {lastResult && !showcaseAnim && (
         <TrainingResult
           result={lastResult}
           statNameTH={lastResult.type === 'punch' ? 'พลังหมัด' : lastResult.type === 'kick' ? 'พลังเตะ' : lastResult.type === 'reaction' ? 'ความเร็ว' : 'ความอึด'}

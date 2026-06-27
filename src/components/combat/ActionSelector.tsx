@@ -14,18 +14,18 @@ interface ActionSelectorProps {
 }
 
 const ACTION_CONFIG: Record<CombatAction, { label: string; icon: string; desc: string; color: string }> = {
-  heavy_strike: { label: 'โจมตีหนัก', icon: '💥', desc: 'รุนแรงแต่ช้า ชนะโจมตีเบา แพ้หลบหลีก', color: '#EF4444' },
-  light_strike: { label: 'โจมตีเบา', icon: '⚡', desc: 'รวดเร็ว ชนะหลบหลีก แพ้ตั้งการ์ด', color: '#EAB308' },
-  defend:       { label: 'ตั้งการ์ด', icon: '🛡️', desc: 'ป้องกันโจมตีเบา 100% ลดโจมตีหนัก 70%', color: '#3B82F6' },
-  dodge:        { label: 'หลบหลีก', icon: '💨', desc: 'หลบโจมตีหนักแล้วสวนกลับ แพ้โจมตีเบา', color: '#10B981' },
-  special:      { label: 'ใช้สกิลพิเศษ', icon: '✨', desc: 'เปิดใช้งานความสามารถพิเศษประจำตัวละคร', color: '#A855F7' },
+  heavy_strike: { label: 'อาวุธ 1: โจมตีหนัก', icon: '💥', desc: 'ดาเมจแรงสูง ชนะโจมตีเบา แพ้หลบหลีก/สวนกลับ', color: '#EF4444' },
+  light_strike: { label: 'อาวุธ 2: โจมตีเบา', icon: '⚡', desc: 'ออกอาวุธเร็ว ชนะหลบหลีก แพ้ตั้งการ์ด', color: '#EAB308' },
+  defend:       { label: 'ป้องกัน 1: ตั้งการ์ด', icon: '🛡️', desc: 'ป้องกันโจมตีเบา 100% ลดโจมตีหนัก 70%', color: '#3B82F6' },
+  dodge:        { label: 'หลบหลีก 1: หลบสวนกลับ', icon: '💨', desc: 'หลบโจมตีหนักแล้วสวนกลับรุนแรง แพ้โจมตีเบา', color: '#10B981' },
+  special:      { label: 'สไตล์: สกิล+วัดดวงพลิกเกม', icon: '🎲✨', desc: 'ใช้ความสามารถพิเศษ วัดดวงปาฏิหาริย์พลิกชนะเมื่อพลังน้อย', color: '#A855F7' },
 };
 
 const ACTIONS: CombatAction[] = ['heavy_strike', 'light_strike', 'defend', 'dodge', 'special'];
 
 export default function ActionSelector({ onSelectAction, abilityId, disabled = false }: ActionSelectorProps) {
   const [selected, setSelected] = useState<CombatAction | null>(null);
-  const [timeLeft, setTimeLeft] = useState(8);
+  const [timeLeft, setTimeLeft] = useState(15);
 
   const ability = ABILITIES.find((a) => a.id === abilityId);
 

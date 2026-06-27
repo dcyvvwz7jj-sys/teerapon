@@ -8,6 +8,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useGameStore } from '@/systems/GameStore';
 import { RealisticFighter } from '@/components/three/RealisticFighter';
 import { ShowroomLighting } from '@/components/three/AdvancedLighting';
+import { CombatArenaEnvironment } from '@/components/three/ArenaBackgrounds';
 import { PostProcessingStack } from '@/components/three/PostProcessingStack';
 
 export default function MainMenuScene() {
@@ -19,15 +20,16 @@ export default function MainMenuScene() {
       {/* 3D Background Canvas */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <Canvas shadows>
-          <PerspectiveCamera makeDefault position={[0, 1.5, 4.5]} fov={50} />
+          <PerspectiveCamera makeDefault position={[0, 0.3, 4.0]} fov={46} />
           <ShowroomLighting />
+          <CombatArenaEnvironment />
           
           {/* Two fighters facing each other */}
-          <group position={[-1.2, -1, 0]} rotation={[0, 0.4, 0]}>
-            <RealisticFighter skinId="skin_01" animation="guard" scale={1.1} />
+          <group position={[-1.1, -0.85, 0]} rotation={[0, 0.85, 0]}>
+            <RealisticFighter skinId="skin_01" animation="guard" scale={0.55} />
           </group>
-          <group position={[1.2, -1, 0]} rotation={[0, -0.4, 0]}>
-            <RealisticFighter skinId="skin_04" animation="guard" mirror scale={1.1} />
+          <group position={[1.1, -0.85, 0]} rotation={[0, -0.85, 0]}>
+            <RealisticFighter skinId="skin_04" animation="guard" mirror scale={0.55} />
           </group>
 
           {/* Floor grid / reflection plane */}

@@ -8,6 +8,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useGameStore } from '@/systems/GameStore';
 import { RealisticFighter } from '@/components/three/RealisticFighter';
 import { ArenaLighting } from '@/components/three/AdvancedLighting';
+import { CombatArenaEnvironment } from '@/components/three/ArenaBackgrounds';
 import { PostProcessingStack } from '@/components/three/PostProcessingStack';
 import HUD from '@/components/ui/HUD';
 import ActionSelector from '@/components/combat/ActionSelector';
@@ -30,8 +31,13 @@ export default function CombatScene() {
   useEffect(() => {
     if (!combatState) {
       setScene('training_hub');
+    } else if (combatState.phase === 'intro') {
+      const timer = setTimeout(() => {
+        setCombatPhase('select_action');
+      }, 1200);
+      return () => clearTimeout(timer);
     }
-  }, [combatState, setScene]);
+  }, [combatState, setScene, setCombatPhase]);
 
   if (!combatState) return null;
 
@@ -42,7 +48,7 @@ export default function CombatScene() {
     const aiAction = chooseAIAction(combatState);
     const result = resolveTurn(combatState, action, aiAction);
 
-    // Trigger initial dynamic strike animations
+    // Trigger logical attack/defense animations
     if (action === 'heavy_strike') setPlayerAnim('hook');
     else if (action === 'light_strike') setPlayerAnim('jab');
     else if (action === 'dodge') setPlayerAnim('dodge_left');
@@ -72,7 +78,7 @@ export default function CombatScene() {
   };
 
   const handleResolverComplete = () => {
-    // Reset to idle/guard stance
+    // Reset to ready guard stance
     setPlayerAnim('guard');
     setAiAnim('guard');
 
@@ -82,14 +88,14 @@ export default function CombatScene() {
       setTimeout(() => {
         endCombat('player', 'KO');
         setScene('match_result');
-      }, 1500);
+      }, 1800);
     } else if (combatState.playerHP <= 0) {
       setPlayerAnim('defeat');
       setAiAnim('victory');
       setTimeout(() => {
         endCombat('opponent', 'KO');
         setScene('match_result');
-      }, 1500);
+      }, 1800);
     } else {
       setCombatPhase('select_action');
     }
@@ -110,13 +116,31 @@ export default function CombatScene() {
         turn={combatState.turn}
       />
 
-      {/* 3D Combat Arena Canvas (Perfectly positioned & facing inwards) */}
+      {/* Intro VS Banner */}
+      {combatState.phase === 'intro' && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', pointerEvents: 'none',
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ fontFamily: 'Orbitron', fontSize: '64px', fontWeight: 900, color: '#FFD700', textShadow: '0 0 30px #FF0055', margin: 0 }}>
+              ROUND {combatState.round} FIGHT!
+            </h1>
+            <p style={{ fontFamily: 'Orbitron', fontSize: '24px', color: '#FFFFFF' }}>
+              {player.name} <span style={{ color: '#EF4444' }}>VS</span> {ai.name}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 3D Combat Arena Canvas */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <Canvas shadows>
-          <PerspectiveCamera makeDefault position={[0, 0.2, 4.0]} fov={45} />
+          <PerspectiveCamera makeDefault position={[0, 0.3, 3.8]} fov={46} />
           <ArenaLighting />
+          <CombatArenaEnvironment />
 
-          {/* Player Fighter (Left facing Right) */}
+          {/* Player Fighter (Left facing inward) */}
           <group position={[-1.1, -0.85, 0]} rotation={[0, 0.85, 0]}>
             <RealisticFighter
               key={player.id + playerAnim}
@@ -126,7 +150,7 @@ export default function CombatScene() {
             />
           </group>
 
-          {/* AI Opponent (Right facing Left) */}
+          {/* AI Opponent (Right facing inward) */}
           <group position={[1.1, -0.85, 0]} rotation={[0, -0.85, 0]}>
             <RealisticFighter
               key={ai.id + aiAnim}
@@ -137,27 +161,17 @@ export default function CombatScene() {
             />
           </group>
 
-          {/* Ring Floor */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.86, 0]} receiveShadow>
-            <planeGeometry args={[18, 18]} />
-            <meshStandardMaterial color="#11131A" roughness={0.5} metalness={0.2} />
-          </mesh>
-          {/* Ring Ropes Border */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.85, 0]}>
-            <ringGeometry args={[5.8, 6.0, 32]} />
-            <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.5} />
-          </mesh>
-
           <PostProcessingStack quality={settings?.quality || 'high'} combatActive={combatState.phase === 'resolving'} />
           <OrbitControls enableZoom={false} enablePan={false} maxPolarAngle={Math.PI / 2 + 0.05} minPolarAngle={Math.PI / 3} />
         </Canvas>
       </div>
 
-      {/* Action Selector Overlay */}
-      {combatState.phase === 'select_action' && (
+      {/* Action Selector Overlay (Always shows during select_action or intro) */}
+      {(combatState.phase === 'select_action' || combatState.phase === 'intro') && (
         <ActionSelector
           abilityId={player.ability}
           onSelectAction={handleSelectAction}
+          disabled={combatState.phase === 'intro'}
         />
       )}
 

@@ -8,6 +8,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useGameStore } from '@/systems/GameStore';
 import { RealisticFighter, SKIN_PRESETS } from '@/components/three/RealisticFighter';
 import { ShowroomLighting } from '@/components/three/AdvancedLighting';
+import { ShowroomEnvironment } from '@/components/three/ArenaBackgrounds';
 import StatBar from '@/components/ui/StatBar';
 import { ABILITIES } from '@/data/constants';
 import { AbilityId } from '@/types/game';
@@ -217,6 +218,7 @@ export default function FighterSelectScene() {
         <Canvas shadows>
           <PerspectiveCamera makeDefault position={[0, 0.2, 3.8]} fov={45} />
           <ShowroomLighting />
+          <ShowroomEnvironment color="#FF8C00" />
           
           <group position={[0, -0.85, 0]}>
             <RealisticFighter

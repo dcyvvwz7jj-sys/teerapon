@@ -8,6 +8,7 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useGameStore } from '@/systems/GameStore';
 import { RealisticFighter } from '@/components/three/RealisticFighter';
 import { ShowroomLighting } from '@/components/three/AdvancedLighting';
+import { ShowroomEnvironment } from '@/components/three/ArenaBackgrounds';
 import { motion } from 'framer-motion';
 
 export default function MatchResultScene() {
@@ -33,6 +34,7 @@ export default function MatchResultScene() {
         <Canvas shadows>
           <PerspectiveCamera makeDefault position={[0, 0.2, 3.8]} fov={45} />
           <ShowroomLighting />
+          <ShowroomEnvironment color={isPlayerWinner ? '#FFD700' : '#EF4444'} />
           
           <group position={[0, -0.85, 0]}>
             <RealisticFighter
