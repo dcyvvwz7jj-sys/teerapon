@@ -59,6 +59,7 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
   const handleClick = useCallback(() => {
     if (phase !== 'playing') return;
 
+    onHitSuccess?.();
     const now = performance.now();
     const timeSinceLast = now - lastClickRef.current;
     lastClickRef.current = now;
@@ -66,13 +67,7 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
     // Rapid clicking = more gauge overshoot
     const clickSpeed = timeSinceLast < 150 ? overchargeRate : 0;
 
-    setGauge((prev) => {
-      const next = Math.min(100, prev + boostPerClick + clickSpeed);
-      if (next >= ZONE_GREEN.min && next <= ZONE_GREEN.max) {
-        onHitSuccess?.();
-      }
-      return next;
-    });
+    setGauge((prev) => Math.min(100, prev + boostPerClick + clickSpeed));
     setClickBurst(true);
     setTimeout(() => setClickBurst(false), 100);
 
@@ -166,10 +161,10 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
     <div
       onClick={phase === 'playing' ? handleClick : undefined}
       style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: '280px', display: 'flex', flexDirection: 'column',
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '210px', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', zIndex: 50,
         background: 'rgba(15, 15, 22, 0.95)', borderTop: '2px solid #22C55E',
-        boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '16px',
+        boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '12px 24px',
         cursor: phase === 'playing' ? 'pointer' : 'default',
         userSelect: 'none',
       }}

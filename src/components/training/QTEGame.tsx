@@ -100,23 +100,21 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel, onHitS
 
       if (phase !== 'playing') return;
 
+      const isDirectionKey = DIRECTIONS.some(d => DIRECTION_CONFIG[d].keys.includes(e.code));
+      if (!isDirectionKey) return;
+
+      onHitSuccess?.();
       const config = DIRECTION_CONFIG[currentDirection];
       const elapsed = performance.now() - startTimeRef.current;
 
       if (config.keys.includes(e.code)) {
         // Correct!
-        onHitSuccess?.();
         setResults((prev) => [...prev, { correct: true, time: elapsed }]);
         setFeedbackType('correct');
       } else {
         // Wrong key
-        const isDirectionKey = DIRECTIONS.some(d => DIRECTION_CONFIG[d].keys.includes(e.code));
-        if (isDirectionKey) {
-          setResults((prev) => [...prev, { correct: false, time: elapsed }]);
-          setFeedbackType('wrong');
-        } else {
-          return; // Ignore non-direction keys
-        }
+        setResults((prev) => [...prev, { correct: false, time: elapsed }]);
+        setFeedbackType('wrong');
       }
       setPhase('feedback');
     };
@@ -171,10 +169,10 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel, onHitS
 
   return (
     <div style={{
-      position: 'absolute', bottom: 0, left: 0, right: 0, height: '280px', display: 'flex', flexDirection: 'column',
+      position: 'absolute', bottom: 0, left: 0, right: 0, height: '210px', display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', zIndex: 50,
       background: 'rgba(15, 15, 22, 0.95)', borderTop: '2px solid #00BFFF',
-      boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '16px',
+      boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '12px 24px',
     }}>
       <AnimatePresence mode="wait">
         {phase === 'ready' && (

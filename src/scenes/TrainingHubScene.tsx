@@ -35,10 +35,12 @@ export default function TrainingHubScene() {
   const [lastResult, setLastResult] = useState<TrainingResultType | null>(null);
   const [showcaseAnim, setShowcaseAnim] = useState<string | null>(null);
   const [hitAnimTrigger, setHitAnimTrigger] = useState<string | null>(null);
+  const [hitKey, setHitKey] = useState(0);
   const [showOpponentSelect, setShowOpponentSelect] = useState(false);
 
   const triggerHitAnim = (anim: string) => {
     setHitAnimTrigger(anim);
+    setHitKey((prev) => prev + 1);
     setTimeout(() => setHitAnimTrigger(null), 600);
   };
 
@@ -86,12 +88,13 @@ export default function TrainingHubScene() {
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#0D0D12', display: 'flex', overflow: 'hidden' }}>
       
-      {/* Left Panel: Fighter Stats & Status */}
-      <div style={{
-        width: '360px', height: '100%', background: 'rgba(15, 15, 22, 0.95)',
-        borderRight: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
-        display: 'flex', flexDirection: 'column', zIndex: 10,
-      }}>
+      {/* Left Panel: Fighter Stats & Status (Hidden during minigame or showcase) */}
+      {!activeGame && !showcaseAnim && !lastResult && (
+        <div style={{
+          width: '360px', height: '100%', background: 'rgba(15, 15, 22, 0.95)',
+          borderRight: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
+          display: 'flex', flexDirection: 'column', zIndex: 10,
+        }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h1 style={{ fontFamily: 'Orbitron', fontSize: '28px', color: '#FFFFFF', margin: 0 }}>{player?.name}</h1>
@@ -132,6 +135,7 @@ export default function TrainingHubScene() {
           ← เปลี่ยนตัวละคร
         </button>
       </div>
+      )}
 
       {/* Center Panel: 3D Gym View with Rich Environment & Dynamic Showcase */}
       <div style={{ flex: 1, height: '100%', position: 'relative' }}>
@@ -146,14 +150,14 @@ export default function TrainingHubScene() {
         )}
 
         <Canvas shadows>
-          <PerspectiveCamera makeDefault position={showcaseAnim ? [0, 0.3, 3.0] : [0, 0.2, 3.8]} fov={45} />
+          <PerspectiveCamera makeDefault position={showcaseAnim ? [0, 0.3, 3.0] : activeGame ? [0, 0.5, 4.2] : [0, 0.2, 3.8]} fov={45} />
           <GymLighting />
           <GymEnvironment />
           
           {player && (
-            <group position={[0, -0.85, 0]}>
+            <group position={activeGame ? [0, -0.3, 0] : [0, -0.85, 0]}>
               <RealisticFighter
-                key={player.id + currentAnim}
+                key={player.id + currentAnim + hitKey}
                 skinId={player.skinPreset || player.skinId}
                 animation={currentAnim}
                 scale={0.58}
@@ -161,16 +165,17 @@ export default function TrainingHubScene() {
             </group>
           )}
 
-          <OrbitControls enableZoom={false} enablePan={false} autoRotate={!showcaseAnim} autoRotateSpeed={1.2} maxPolarAngle={Math.PI / 2 + 0.05} minPolarAngle={Math.PI / 3} />
+          <OrbitControls enableZoom={false} enablePan={false} autoRotate={!showcaseAnim && !activeGame} autoRotateSpeed={1.2} maxPolarAngle={Math.PI / 2 + 0.05} minPolarAngle={Math.PI / 3} />
         </Canvas>
       </div>
 
-      {/* Right Panel: Training Minigame Selector & Fight Button */}
-      <div style={{
-        width: '380px', height: '100%', background: 'rgba(15, 15, 22, 0.95)',
-        borderLeft: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
-        display: 'flex', flexDirection: 'column', zIndex: 10,
-      }}>
+      {/* Right Panel: Training Minigame Selector & Fight Button (Hidden during minigame or showcase) */}
+      {!activeGame && !showcaseAnim && !lastResult && (
+        <div style={{
+          width: '380px', height: '100%', background: 'rgba(15, 15, 22, 0.95)',
+          borderLeft: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
+          display: 'flex', flexDirection: 'column', zIndex: 10,
+        }}>
         <h2 style={{ fontFamily: 'Orbitron', fontSize: '22px', color: '#FFFFFF', marginBottom: '8px' }}>
           คอร์สฝึกซ้อมมินิเกม
         </h2>
@@ -257,6 +262,7 @@ export default function TrainingHubScene() {
           🔥 เข้าสู่ลานประลอง (FIGHT!)
         </button>
       </div>
+      )}
 
       {/* Opponent Selection Modal */}
       {showOpponentSelect && (

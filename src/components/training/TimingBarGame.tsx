@@ -88,6 +88,7 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
   const handleClick = useCallback(() => {
     if (phase !== 'playing' || frozen) return;
 
+    onHitSuccess?.();
     setFrozen(true);
     cancelAnimationFrame(animRef.current);
 
@@ -110,9 +111,6 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
       hitResult = 'miss';
     }
 
-    if (hitResult === 'perfect' || hitResult === 'good') {
-      onHitSuccess?.();
-    }
     setLastHitResult(hitResult);
     setScores((prev) => [...prev, score]);
 
@@ -163,12 +161,17 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
   const title = isPunch ? 'ฝึกพลังหมัด' : 'ฝึกพลังเตะ';
 
   return (
-    <div style={{
-      position: 'absolute', bottom: 0, left: 0, right: 0, height: '280px', display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center', zIndex: 50,
-      background: 'rgba(15, 15, 22, 0.95)', borderTop: `2px solid ${accentColor}`,
-      boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '16px',
-    }}>
+    <div
+      onClick={phase === 'playing' ? handleClick : undefined}
+      style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '210px', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', zIndex: 50,
+        background: 'rgba(15, 15, 22, 0.95)', borderTop: `2px solid ${accentColor}`,
+        boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '12px 24px',
+        cursor: phase === 'playing' ? 'pointer' : 'default',
+        userSelect: 'none',
+      }}
+    >
       <AnimatePresence mode="wait">
         {phase === 'ready' && (
           <motion.div
