@@ -56,7 +56,7 @@ export default function FighterSelectScene() {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#0A0A0E', display: 'flex', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: 'radial-gradient(circle at center, rgba(10,10,14,0.3) 0%, rgba(10,10,14,0.85) 100%), url("/backgrounds/fighter_select.png") center/cover no-repeat', display: 'flex', overflow: 'hidden' }}>
       
       {/* Left Panel: Tabs & Selection/Creation Controls */}
       <div style={{

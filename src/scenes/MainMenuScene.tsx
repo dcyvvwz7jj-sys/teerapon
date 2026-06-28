@@ -17,7 +17,7 @@ export default function MainMenuScene() {
   const [showManual, setShowManual] = useState(false);
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#0A0A0E', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: 'radial-gradient(circle at center, rgba(10,10,14,0.3) 0%, rgba(10,10,14,0.85) 100%), url("/backgrounds/main_menu.png") center/cover no-repeat', overflow: 'hidden' }}>
       {/* 3D Background Canvas */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <Canvas shadows>

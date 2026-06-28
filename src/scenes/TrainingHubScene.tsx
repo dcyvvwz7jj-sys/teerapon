@@ -102,7 +102,7 @@ export default function TrainingHubScene() {
   const availableOpponents = fighters.filter((f) => f.id !== player?.id);
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#0D0D12', display: 'flex', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: 'radial-gradient(circle at center, rgba(13,13,18,0.3) 0%, rgba(13,13,18,0.85) 100%), url("/backgrounds/training_hub.png") center/cover no-repeat', display: 'flex', overflow: 'hidden' }}>
       
       {/* Left Panel: Fighter Stats & Status (Always visible) */}
       <div style={{

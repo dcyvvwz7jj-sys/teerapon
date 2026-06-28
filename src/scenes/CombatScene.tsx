@@ -112,7 +112,7 @@ export default function CombatScene() {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#05050A', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', background: 'radial-gradient(circle at center, rgba(5,5,10,0.3) 0%, rgba(5,5,10,0.85) 100%), url("/backgrounds/combat_arena.png") center/cover no-repeat', overflow: 'hidden' }}>
       
       {/* HUD Overlay */}
       <HUD
