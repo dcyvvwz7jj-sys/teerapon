@@ -104,13 +104,12 @@ export default function TrainingHubScene() {
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', background: '#0D0D12', display: 'flex', overflow: 'hidden' }}>
       
-      {/* Left Panel: Fighter Stats & Status (Hidden during minigame or showcase) */}
-      {!activeGame && !showcaseAnim && !lastResult && (
-        <div style={{
-          width: '360px', flexShrink: 0, height: '100%', background: 'rgba(15, 15, 22, 0.95)',
-          borderRight: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
-          display: 'flex', flexDirection: 'column', zIndex: 30,
-        }}>
+      {/* Left Panel: Fighter Stats & Status (Always visible) */}
+      <div style={{
+        width: '360px', flexShrink: 0, height: '100%', background: 'rgba(15, 15, 22, 0.95)',
+        borderRight: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
+        display: 'flex', flexDirection: 'column', zIndex: 30,
+      }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h1 style={{ fontFamily: 'Orbitron', fontSize: '28px', color: '#FFFFFF', margin: 0 }}>{player?.name}</h1>
@@ -120,27 +119,27 @@ export default function TrainingHubScene() {
             padding: '8px 16px', background: 'rgba(255, 140, 0, 0.15)', border: '1px solid #FF8C00',
             borderRadius: '20px', fontFamily: 'Orbitron', fontWeight: 700, color: '#FF8C00', fontSize: '14px',
           }}>
-            ⚡ {sessionsLeft} เซสชัน
+            ⚡ {player?.trainingSessions || 0} เซสชัน
           </div>
         </div>
 
-        {/* Stats */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '24px' }}>
+        {/* Stats Summary */}
+        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <StatBar label="พลังหมัด (Punch Power)" value={player?.stats.punchPower || 1} color="#FF4444" />
           <StatBar label="พลังเตะ (Kick Power)" value={player?.stats.kickPower || 1} color="#FF8C00" />
           <StatBar label="ความเร็ว (Reaction Speed)" value={player?.stats.reactionSpeed || 1} color="#00BFFF" />
           <StatBar label="ความอึด (Endurance)" value={player?.stats.endurance || 1} color="#22C55E" />
         </div>
 
-        {/* Ability info */}
+        {/* Active Ability Info */}
         {ability && (
-          <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', marginBottom: 'auto', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ fontFamily: 'Orbitron', fontWeight: 700, fontSize: '14px', color: '#A855F7', marginBottom: '4px' }}>
-              ✨ {ability.nameTH}
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: 'auto' }}>
+            <div style={{ fontFamily: 'Orbitron', fontWeight: 700, color: '#FFD700', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>✨</span> {ability.nameTH}
             </div>
-            <div style={{ fontFamily: 'Inter', fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+            <p style={{ fontFamily: 'Inter', fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5, margin: 0 }}>
               {ability.descriptionTH}
-            </div>
+            </p>
           </div>
         )}
 
@@ -151,10 +150,9 @@ export default function TrainingHubScene() {
           ← เปลี่ยนตัวละคร
         </button>
       </div>
-      )}
 
       {/* Center Panel: 3D Gym View with Rich Environment & Dynamic Showcase */}
-      <div style={{ flex: 1, height: '100%', position: 'relative' }}>
+      <div style={{ flex: 1, minWidth: 0, height: '100%', position: 'relative', overflow: 'hidden' }}>
         {showcaseAnim && (
           <div style={{
             position: 'absolute', top: 20, left: 0, right: 0, zIndex: 20, textAlign: 'center', pointerEvents: 'none',
@@ -185,8 +183,8 @@ export default function TrainingHubScene() {
         </Canvas>
       </div>
 
-      {/* Right Panel: Training Minigame Selector & Fight Button (Hidden during minigame or showcase) */}
-      {!activeGame && !showcaseAnim && !lastResult && (
+      {/* Right Panel: Training Minigame Selector & Fight Button (Hidden only during active gameplay) */}
+      {!activeGame && (
         <div style={{
           width: '380px', flexShrink: 0, height: '100%', background: 'rgba(15, 15, 22, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
