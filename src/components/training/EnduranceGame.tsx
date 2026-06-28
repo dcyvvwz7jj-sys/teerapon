@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TrainingGrade, TrainingResult } from '@/types/game';
-import { playUIClick, playVictorySound, playPunchSound } from '@/systems/AudioSystem';
+import { playUIClick, playVictorySound, playPunchSound, playCrowdCheer } from '@/systems/AudioSystem';
 
 interface EnduranceGameProps {
   currentStatLevel: number;
@@ -111,6 +111,7 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
 
       if (remaining <= 0) {
         playVictorySound();
+        playCrowdCheer();
         setTotalSamples((currentTotal) => {
           setGreenTime((currentGreen) => {
             const greenPercentage = currentTotal > 0 ? (currentGreen / currentTotal) * 100 : 0;

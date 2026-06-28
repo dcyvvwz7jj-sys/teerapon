@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TrainingGrade, TrainingResult } from '@/types/game';
-import { playUIClick, playVictorySound, playPunchSound } from '@/systems/AudioSystem';
+import { playUIClick, playVictorySound, playPunchSound, playCrowdCheer } from '@/systems/AudioSystem';
 
 interface QTEGameProps {
   currentStatLevel: number;
@@ -111,6 +111,7 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel, onHitS
       if (config.keys.includes(e.code)) {
         // Correct!
         playPunchSound();
+        if (elapsed < timeWindow * 0.45) playCrowdCheer();
         setResults((prev) => [...prev, { correct: true, time: elapsed }]);
         setFeedbackType('correct');
       } else {

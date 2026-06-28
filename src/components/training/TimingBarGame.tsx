@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { TrainingGrade, TrainingResult, TrainingType } from '@/types/game';
-import { playPunchSound, playKickSound, playVictorySound, playUIClick } from '@/systems/AudioSystem';
+import { playPunchSound, playKickSound, playVictorySound, playUIClick, playCrowdCheer } from '@/systems/AudioSystem';
 
 interface TimingBarGameProps {
   trainingType: 'punch' | 'kick';
@@ -107,6 +107,7 @@ export default function TimingBarGame({ trainingType, currentStatLevel, onComple
     if (distance <= halfWidth * 0.3) {
       score = 100;
       hitResult = 'perfect';
+      playCrowdCheer();
     } else if (distance <= halfWidth) {
       score = 60 + (1 - distance / halfWidth) * 40;
       hitResult = 'good';

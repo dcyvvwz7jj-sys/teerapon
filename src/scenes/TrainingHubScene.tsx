@@ -14,7 +14,7 @@ import TimingBarGame from '@/components/training/TimingBarGame';
 import QTEGame from '@/components/training/QTEGame';
 import EnduranceGame from '@/components/training/EnduranceGame';
 import TrainingResult from '@/components/training/TrainingResult';
-import { playUIClick } from '@/systems/AudioSystem';
+import { playUIClick, playVictorySound, playCrowdCheer, playPunchSound, playKickSound, playDodgeSound, playBlockSound } from '@/systems/AudioSystem';
 import type { TrainingResult as TrainingResultType } from '@/types/game';
 import { ABILITIES, MAX_TRAINING_SESSIONS } from '@/data/constants';
 
@@ -46,17 +46,32 @@ export default function TrainingHubScene() {
   };
 
   const handleMinigameComplete = (res: TrainingResultType) => {
-    // Trigger cool training showcase animation
-    if (res.type === 'punch') setShowcaseAnim('hook');
-    else if (res.type === 'kick') setShowcaseAnim('spinning_kick');
-    else if (res.type === 'reaction') setShowcaseAnim('dodge_left');
-    else if (res.type === 'endurance') setShowcaseAnim('guard');
+    setActiveGame(null); // Unmount frozen minigame UI immediately!
+
+    // Trigger cool training showcase animation & corresponding sound
+    if (res.type === 'punch') {
+      setShowcaseAnim('hook');
+      playPunchSound(true);
+    } else if (res.type === 'kick') {
+      setShowcaseAnim('spinning_kick');
+      playKickSound(true);
+    } else if (res.type === 'reaction') {
+      setShowcaseAnim('dodge_left');
+      playDodgeSound();
+    } else if (res.type === 'endurance') {
+      setShowcaseAnim('guard');
+      playBlockSound();
+    }
 
     setTimeout(() => {
       setShowcaseAnim('victory');
-    }, 2000);
-
-    setLastResult(res);
+      playVictorySound();
+      playCrowdCheer();
+      setTimeout(() => {
+        setShowcaseAnim(null); // Clear showcaseAnim so TrainingResult modal pops up!
+        setLastResult(res);
+      }, 1800);
+    }, 1500);
   };
 
   const handleContinueResult = () => {
