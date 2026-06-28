@@ -107,9 +107,9 @@ export default function TrainingHubScene() {
       {/* Left Panel: Fighter Stats & Status (Hidden during minigame or showcase) */}
       {!activeGame && !showcaseAnim && !lastResult && (
         <div style={{
-          width: '360px', height: '100%', background: 'rgba(15, 15, 22, 0.95)',
+          width: '360px', flexShrink: 0, height: '100%', background: 'rgba(15, 15, 22, 0.95)',
           borderRight: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
-          display: 'flex', flexDirection: 'column', zIndex: 10,
+          display: 'flex', flexDirection: 'column', zIndex: 30,
         }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
@@ -188,9 +188,9 @@ export default function TrainingHubScene() {
       {/* Right Panel: Training Minigame Selector & Fight Button (Hidden during minigame or showcase) */}
       {!activeGame && !showcaseAnim && !lastResult && (
         <div style={{
-          width: '380px', height: '100%', background: 'rgba(15, 15, 22, 0.95)',
+          width: '380px', flexShrink: 0, height: '100%', background: 'rgba(15, 15, 22, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.1)', padding: '32px 24px',
-          display: 'flex', flexDirection: 'column', zIndex: 10,
+          display: 'flex', flexDirection: 'column', zIndex: 30,
         }}>
         <h2 style={{ fontFamily: 'Orbitron', fontSize: '22px', color: '#FFFFFF', marginBottom: '8px' }}>
           คอร์สฝึกซ้อมมินิเกม

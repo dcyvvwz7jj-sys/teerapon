@@ -44,6 +44,7 @@ function createNoiseBuffer(duration: number): AudioBuffer | null {
 }
 
 export function playGymAmbience() {
+  initAudio();
   if (!actx || !ambienceGain) return;
   stopAmbience();
   
@@ -65,6 +66,7 @@ export function playGymAmbience() {
 }
 
 export function playArenaAmbience() {
+  initAudio();
   if (!actx || !ambienceGain) return;
   stopAmbience();
   
@@ -95,6 +97,7 @@ export function stopAmbience() {
 }
 
 export function playPunchSound(isCritical = false) {
+  initAudio();
   if (!actx || !sfxGain) return;
   const t = actx.currentTime;
   
@@ -130,6 +133,7 @@ export function playPunchSound(isCritical = false) {
 }
 
 export function playKickSound(isCritical = false) {
+  initAudio();
   if (!actx || !sfxGain) return;
   const t = actx.currentTime;
   
@@ -161,6 +165,7 @@ export function playKickSound(isCritical = false) {
 }
 
 export function playBlockSound() {
+  initAudio();
   if (!actx || !sfxGain) return;
   const t = actx.currentTime;
   const osc = actx.createOscillator();
@@ -181,6 +186,7 @@ export function playBlockSound() {
 }
 
 export function playDodgeSound() {
+  initAudio();
   if (!actx || !sfxGain) return;
   const t = actx.currentTime;
   const noiseBuffer = createNoiseBuffer(0.3);
@@ -202,6 +208,7 @@ export function playDodgeSound() {
 }
 
 export function playKnockdownSound() {
+  initAudio();
   if (!actx || !sfxGain) return;
   playKickSound(true); // Big thud
   const t = actx.currentTime;
@@ -219,6 +226,7 @@ export function playKnockdownSound() {
 }
 
 export function playCrowdCheer() {
+  initAudio();
   if (!actx || !sfxGain) return;
   const t = actx.currentTime;
   const noiseBuffer = createNoiseBuffer(3.0);
@@ -239,6 +247,7 @@ export function playCrowdCheer() {
 }
 
 export function playBellSound() {
+  initAudio();
   if (!actx || !sfxGain) return;
   const ctx = actx;
   const gainNode = sfxGain;
@@ -258,8 +267,8 @@ export function playBellSound() {
 }
 
 export function playUIClick() {
-  if (!actx || !sfxGain) return;
   initAudio();
+  if (!actx || !sfxGain) return;
   const t = actx.currentTime;
   const osc = actx.createOscillator();
   const gain = actx.createGain();
@@ -275,6 +284,7 @@ export function playUIClick() {
 }
 
 export function playVictorySound() {
+  initAudio();
   if (!actx || !sfxGain) return;
   const ctx = actx;
   const gainNode = sfxGain;
@@ -294,6 +304,7 @@ export function playVictorySound() {
 }
 
 export function playDefeatSound() {
+  initAudio();
   if (!actx || !sfxGain) return;
   const ctx = actx;
   const gainNode = sfxGain;
