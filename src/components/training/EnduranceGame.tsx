@@ -182,10 +182,10 @@ export default function EnduranceGame({ currentStatLevel, onComplete, onCancel, 
     <div
       onClick={phase === 'playing' ? handleClick : undefined}
       style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: '210px', display: 'flex', flexDirection: 'column',
+        position: 'absolute', bottom: '30px', left: '10%', right: '10%', minHeight: '300px', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', zIndex: 50,
-        background: 'rgba(15, 15, 22, 0.95)', borderTop: '2px solid #22C55E',
-        boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '12px 24px',
+        background: 'rgba(15, 15, 22, 0.95)', border: '2px solid #22C55E', borderRadius: '20px',
+        boxShadow: '0 0 30px #22C55E40, 0 10px 30px rgba(0,0,0,0.8)', padding: '24px',
         cursor: phase === 'playing' ? 'pointer' : 'default',
         userSelect: 'none',
       }}

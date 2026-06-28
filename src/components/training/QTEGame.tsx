@@ -188,10 +188,10 @@ export default function QTEGame({ currentStatLevel, onComplete, onCancel, onHitS
 
   return (
     <div style={{
-      position: 'absolute', bottom: 0, left: 0, right: 0, height: '210px', display: 'flex', flexDirection: 'column',
+      position: 'absolute', bottom: '30px', left: '10%', right: '10%', minHeight: '340px', display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', zIndex: 50,
-      background: 'rgba(15, 15, 22, 0.95)', borderTop: '2px solid #00BFFF',
-      boxShadow: '0 -10px 30px rgba(0,0,0,0.8)', padding: '12px 24px',
+      background: 'rgba(15, 15, 22, 0.95)', border: '2px solid #00BFFF', borderRadius: '20px',
+      boxShadow: '0 0 30px #00BFFF40, 0 10px 30px rgba(0,0,0,0.8)', padding: '24px',
     }}>
       <AnimatePresence mode="wait">
         {phase === 'ready' && (
